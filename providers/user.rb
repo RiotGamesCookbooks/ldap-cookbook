@@ -19,6 +19,8 @@
 #
 #
 
+use_inline_resources
+
 def whyrun_supported?
   true
 end
@@ -115,9 +117,9 @@ def load_current_resource
   ldap = Chef::Ldap.new
   @connectinfo = load_connection_info
   @current_resource = ldap.search( @connectinfo, 
-                                     @new_resource.basedn, 
-                                     "(#{new_resource.relativedn_attribute}=#{new_resource.common_name})", 
-                                     'one' ).first
+                                   @new_resource.basedn, 
+                                   "(#{new_resource.relativedn_attribute}=#{new_resource.common_name})", 
+                                   'one' ).first
   @current_resource
 end
 
