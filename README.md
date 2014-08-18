@@ -39,12 +39,12 @@ Creates a user for various kinds of identity management purposes. This is useful
 Name | Description | Type | Default
 -----|-------------|------|----------
 common_name | Value to be set as both uid and cn attributes. See relativedn_attribute | String  | Name Attribute
-surname | The surname of the user. Should be set on accounts that will be used by people | String | Matches the value of common_name.
+surname | The surname of the user. Should be set on accounts that will be used by people | String | Matches the value of common_name
 password | Optional password should be specified in plaintext. Will be converted to a salted sha (SSHA) hash before being sent to the directory | String
 home | home directory. Required for posix accounts | String
-shell | login shell. Required for posix accounts. | String
+shell | login shell. Required for posix accounts | String
 basedn | The DN that will be the parent of the user account entry ( e.g. 'ou=people,... ). Required | String
-relativedn_attribute | The relative distinguished name (RDN) attribute. This is will be used to name the common_name attribute from above. Given a common_name of 'bjensen' and a basedn attribute of 'ou=people,o=myorg,c=US' the distinguished name would be 'uid=bjensen,ou=people,o=myorg,c=US'. | 'uid'
+relativedn_attribute | The relative distinguished name (RDN) attribute. This is will be used to name the common_name attribute from above. Given a common_name of 'bjensen' and a basedn attribute of 'ou=people,o=myorg,c=US' the distinguished name would be 'uid=bjensen,ou=people,o=myorg,c=US' | 'uid'
 uid_number | Required for posix accounts. If not supplied, the basedn will be searched for the highest value and the next increment will be used | Integer | 1000
 gid_number | Required for posix accounts. If not supplied, the basedn will be searched for the highest value and the next increment will be used | Integer | 1000
 is_person | Will this be used by a person? | Boolean | true
@@ -66,14 +66,14 @@ password | The password, in plain text | 'Super Cool Passwords Are Super Cool!!!
 
 ## Usage
 
-The default recipe will ensure that the necessary gems are installed for chef.
+The default recipe will ensure that the necessary gems are installed for chef
 
 
 ```
 include_recipe "ldap"
 
 ldap_entry "ou=people,o=myorg" do
-  attributes ({ ou: [ 'top', 'organizationalUnit'],
+  attributes ({ objectClass: [ 'top', 'organizationalUnit'],
                 ou: 'people',
                 description: 'The people in my organization' })
 end
