@@ -66,7 +66,7 @@ password | The password, in plain text | 'Super Cool Passwords Are Super Cool!!!
 
 ## Usage
 
-### ldap::default
+The default recipe will ensure that the necessary gems are installed for chef.
 
 
 ```
