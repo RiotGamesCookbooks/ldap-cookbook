@@ -12,7 +12,7 @@ Ruby Gems: net-ldap, cicphash
 
 ### ldap_entry
 
-After the initial setup of the directory server, all subsequent configuration can be accomplished by manipulating LDAP entries in the directory itself. This resource is used to manage generic LDAP entries. It makes use of the ruby net-ldap library, and can be used with any LDAP directory service.
+This resource is used to manage generic LDAP entries. It makes use of the ruby net-ldap library, and can be used with any LDAP directory service.
 
 Name | Description | Type | Default
 -----|-------------|------|----------
@@ -30,7 +30,7 @@ __ACTIONS__
 * __create__
 * delete
 
-__*The resources below all make use of this one to create objects in the directory server. This means that they also require the 'host', 'port', 'credentials' and 'databag_name' parameters which are simply passed through to this resource. Omitting these common parameters from the resource descriptions below for brevity*__
+__*Other resources in this cookbook make use of this one to create objects in the directory server. This means that they also require the 'host', 'port', 'credentials' and 'databag_name' parameters which are simply passed through to this resource. Omitting these common parameters from the resource descriptions below for brevity*__
 
 ### ldap_user
 
@@ -61,11 +61,8 @@ The 'credentials' attribute found on the resources above provides a way to use c
 
 key      | value | example
 ---------|-------|--------
-userdn   | The bind DN used to initialize the instance and create the initial set of LDAP entries | 'cn=Directory Manager' |
+bind_dn   | The bind DN used to initialize the instance and create the initial set of LDAP entries | 'cn=Directory Manager' |
 password | The password, in plain text | 'Super Cool Passwords Are Super Cool!!!!!'
-user     | Used by the admin_credentials attribute to setup the 389 admin server | 'manager'
-
-You can specify userdn or user, or both of them if you want the user of the Admin Server to have the same password as the Directory Manager. Of course, you can have many different sets of credentials.
 
 ## Usage
 

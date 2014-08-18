@@ -10,7 +10,7 @@ class Chef # :nodoc:
     #
     # host:: the ldap host to connect to.
     # port:: the ldap port to connect to
-    # credentials:: either a hash with the userdn and password to use, or a string that identifies the name of a databag item.
+    # credentials:: either a hash with the bind_dn and password to use, or a string that identifies the name of a databag item.
     #               see the documentation in the README.md for details.
     # databag_name:: the name of the databag in which to lookup the credentials
     #
@@ -57,7 +57,7 @@ class Chef # :nodoc:
         credentials = Chef::EncryptedDataBagItem.load( databag_name.to_s, credentials, secret ).to_hash
       end
 
-      unless credentials.kind_of?(Hash) and credentials.key?('userdn') and credentials.key?('password')
+      unless credentials.kind_of?(Hash) and credentials.key?('bind_dn') and credentials.key?('password')
         raise "Invalid credentials: #{credentials}"
       end
 
@@ -65,7 +65,7 @@ class Chef # :nodoc:
                             port: port,
                             auth: { 
                               method:   :simple,
-                              username: credentials['userdn'],
+                              username: credentials['bind_dn'],
                               password: credentials['password']
                             }
   
