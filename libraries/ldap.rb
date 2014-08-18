@@ -14,7 +14,7 @@ class Chef # :nodoc:
     #               see the documentation in the README.md for details.
     # databag_name:: the name of the databag in which to lookup the credentials
     #
-    # The main user of this library is the dirsrv_entry resource, which has sensible defaults for these three items.
+    # The main user of this library is the ldap_entry resource, which has sensible defaults for these three items.
   
     attr_accessor :ldap
  
@@ -114,7 +114,7 @@ class Chef # :nodoc:
     # == Get Entry
     # 
     # This method accepts a connection resource object. It is intended to be used with
-    # Chef::Resource::DirsrvEntry objects that will also have a .dn method indicating
+    # Chef::Resource::LdapEntry objects that will also have a .dn method indicating
     # Distinguished Name to be retrieved. It returns a single entry.
  
     def get_entry( c, dn ) # :yields: connection_info, distinguished_name
@@ -135,7 +135,7 @@ class Chef # :nodoc:
     # == Add Entry
     # 
     # This method accepts a connection resource object. It is intended to be used with
-    # Chef::Resource::DirsrvEntry objects that will also have a .dn method and attributes 
+    # Chef::Resource::LdapEntry objects that will also have a .dn method and attributes 
     # to be set on the entry to be created.
 
     def add_entry( c, resource ) # :yields: connection_info, resource
@@ -154,7 +154,7 @@ class Chef # :nodoc:
     # == Modify Entry
     # 
     # Accepts a connection resource object as the first argument, followed by an Array
-    # of ldap operations. It is intended to be used with Chef::Resource::DirsrvEntry 
+    # of ldap operations. It is intended to be used with Chef::Resource::LdapEntry 
     # objects that will also have a .dn method that returns the DN of the entry to be modified.
     #
     # Each ldap operation in the ldap operations list is an Array object with the following items:
