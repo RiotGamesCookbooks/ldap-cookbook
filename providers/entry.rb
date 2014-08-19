@@ -18,6 +18,8 @@
 # limitations under the License.
 #
 
+require 'cicphash'
+
 def whyrun_supported?
   true
 end
@@ -42,34 +44,42 @@ action :create do
       new_resource.updated_by_last_action(true)
     else
 
+      new_attributes = CICPHash.new.merge(@new_resource.attributes.to_hash)
+      seed_attributes = CICPHash.new.merge(@new_resource.seed_attributes.to_hash)
+      seed_attribute_names = seed_attributes.keys.map{ |k| k.downcase.to_s }
       current_attribute_names = @current_resource.attribute_names.map{ |k| k.downcase.to_s }
 
       # Include seed attributes in with the normal attributes as long as they don't already exist
-      @new_resource.seed_attributes.keys.each{ |k| @new_resource.seed_attributes[k.downcase.to_s] = @new_resource.seed_attributes.delete(k) }
-      ( @new_resource.seed_attributes.keys - current_attribute_names ).map{ |attr|
-        @new_resource.attributes.merge!({ attr => @new_resource.seed_attributes[attr].is_a?(String) ? [ @new_resource.seed_attributes[attr] ] : @new_resource.seed_attributes[attr] })
-      }
+      ( seed_attribute_names - current_attribute_names ).each do |attr|
+        value = seed_attributes[attr].is_a?(String) ? [ seed_attributes[attr] ] : seed_attributes[attr]
+        new_attributes.merge!({ attr => value })
+      end
 
-      all_attributes = @new_resource.attributes.merge(@new_resource.append_attributes)
+      append_attributes = CICPHash.new.merge(@new_resource.append_attributes.to_hash)
+      all_attributes = new_attributes.merge(append_attributes)
+      all_attribute_names = all_attributes.keys.map{ |k| k.downcase.to_s }
 
       # Add keys that are missing
-      add_keys = ( all_attributes.keys - current_attribute_names ).map{ |attr|
-        [ :add, attr, all_attributes[attr].is_a?(String) ? [ all_attributes[attr] ] : all_attributes[attr] ]
-      }
+      add_keys = Array.new
+
+      ( all_attribute_names - current_attribute_names ).each do |attr|
+        add_values = attr.is_a?(String) ? [ attr ] : attr
+        add_keys.push([ :add, attr, add_values ])
+      end
 
       # Update existing keys, append values if necessary
       update_keys = Array.new
 
-      ( all_attributes.keys & current_attribute_names ).each do |attr|
+      ( all_attribute_names & current_attribute_names ).each do |attr|
 
         # Ignore Distinguished Name (DN) and the Relative DN. 
         # These should only be modified upon entry creation to avoid schema violations
         relative_distinguished_name = @new_resource.distinguished_name.split('=').first
         next if attr =~ /DN/i || attr <=> relative_distinguished_name 
 
-        if @new_resource.append_attributes[attr]
+        if append_attributes[attr]
 
-          append_values = @new_resource.append_attributes[attr].is_a?(String) ? [ @new_resource.append_attributes[attr] ] : @new_resource.append_attributes[attr]
+          append_values = append_attributes[attr].is_a?(String) ? [ append_attributes[attr] ] : append_attributes[attr]
           append_values -= @current_resource.send(attr)
 
           if append_values.size > 0 
@@ -77,9 +87,9 @@ action :create do
           end
         end
 
-        if @new_resource.attributes[attr]
+        if new_attributes[attr]
 
-          replace_values = @new_resource.attributes[attr].is_a?(String) ? [ @new_resource.attributes[attr] ] : @new_resource.attributes[attr]
+          replace_values = new_attributes[attr].is_a?(String) ? [ new_attributes[attr] ] : new_attributes[attr]
 
           if ( replace_values.size > 0 ) and ( replace_values != @current_resource.send(attr) )
             update_keys.push([ :replace, attr, replace_values ])
@@ -89,6 +99,7 @@ action :create do
 
       # Prune unwanted attributes and/or values
       prune_keys = Array.new
+
       if @new_resource.prune.is_a?(Array)
         @new_resource.prune.each do |attr|
           next unless @current_resource.respond_to?(attr)
