@@ -21,7 +21,7 @@
 actions :create, :delete
 default_action :create
 
-attribute :dn, :kind_of => String, :name_attribute => true
+attribute :distinguished_name, :kind_of => String, :name_attribute => true
 attribute :attributes, :kind_of => Hash, :default => {}
 attribute :append_attributes, :kind_of => Hash, :default => {}
 attribute :seed_attributes, :kind_of => Hash, :default => {}

@@ -31,13 +31,13 @@ action :create do
     @new_resource.attributes[k.downcase.to_s] = @new_resource.attributes.delete(k)
   end
 
-  converge_by("Entry #{@new_resource.dn}") do
+  converge_by("Entry #{@new_resource.distinguished_name}") do
 
     ldap = Chef::Ldap.new
     @connectinfo = load_connection_info
 
     if @current_resource.nil?
-      Chef::Log.info("Adding #{@new_resource.dn}")
+      Chef::Log.info("Adding #{@new_resource.distinguished_name}")
       ldap.add_entry(@connectinfo, @new_resource)
       new_resource.updated_by_last_action(true)
     else
@@ -64,8 +64,8 @@ action :create do
 
         # Ignore Distinguished Name (DN) and the Relative DN. 
         # These should only be modified upon entry creation to avoid schema violations
-        rdn = @new_resource.dn.split('=').first
-        next if attr =~ /DN/i || attr <=> rdn 
+        relative_distinguished_name = @new_resource.distinguished_name.split('=').first
+        next if attr =~ /DN/i || attr <=> relative_distinguished_name 
 
         if @new_resource.append_attributes[attr]
 
@@ -108,18 +108,18 @@ action :create do
         # Submit one set of operations at a time, easier to debug
 
         if add_keys.size > 0
-          Chef::Log.info("Add #{@new_resource.dn} #{ add_keys }")
-          ldap.modify_entry(@connectinfo, @new_resource.dn, add_keys)
+          Chef::Log.info("Add #{@new_resource.distinguished_name} #{ add_keys }")
+          ldap.modify_entry(@connectinfo, @new_resource.distinguished_name, add_keys)
         end
 
         if update_keys.size > 0
-          Chef::Log.info("Update #{@new_resource.dn} #{update_keys}")
-          ldap.modify_entry(@connectinfo, @new_resource.dn, update_keys)
+          Chef::Log.info("Update #{@new_resource.distinguished_name} #{update_keys}")
+          ldap.modify_entry(@connectinfo, @new_resource.distinguished_name, update_keys)
         end
 
         if prune_keys.size > 0
-          Chef::Log.info("Delete #{@new_resource.dn} #{prune_keys}")
-          ldap.modify_entry(@connectinfo, @new_resource.dn, prune_keys)
+          Chef::Log.info("Delete #{@new_resource.distinguished_name} #{prune_keys}")
+          ldap.modify_entry(@connectinfo, @new_resource.distinguished_name, prune_keys)
         end
 
         new_resource.updated_by_last_action(true)
@@ -145,7 +145,7 @@ def load_current_resource
 
   ldap = Chef::Ldap.new
   @connectinfo = load_connection_info
-  @current_resource = ldap.get_entry(@connectinfo, @new_resource.dn)
+  @current_resource = ldap.get_entry(@connectinfo, @new_resource.distinguished_name)
   @current_resource
 end
 
