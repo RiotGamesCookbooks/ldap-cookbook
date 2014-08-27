@@ -18,13 +18,13 @@
 # limitations under the License.
 #
 
-require 'cicphash'
-
 def whyrun_supported?
   true
 end
 
 action :create do
+
+  require 'cicphash'
 
   @current_resource = load_current_resource
 
