@@ -34,7 +34,7 @@ action :create do
     dn = "#{new_resource.relativedn_attribute}=#{new_resource.common_name},#{new_resource.basedn}"
 
     objclass = [ 'top', 'account' ]
-    attrs = { uid: new_resource.common_name }
+    attrs = new_resource.attrs.merge({ uid: new_resource.common_name })
     attrs[new_resource.relativedn_attribute.to_sym] = new_resource.common_name
 
     objclass.push( 'extensibleObject' ) if new_resource.is_extensible

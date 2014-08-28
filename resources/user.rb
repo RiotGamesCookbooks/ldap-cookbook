@@ -33,6 +33,7 @@ attribute :gid_number, :kind_of => Integer
 attribute :is_person, :kind_of => [ TrueClass, FalseClass ], :default => true
 attribute :is_posix, :kind_of => [ TrueClass, FalseClass ], :default => true
 attribute :is_extensible, :kind_of => [ TrueClass, FalseClass ], :default => false
+attribute :attrs, :kind_of => Hash, :default => {}
 attribute :host, :kind_of => String, :default => 'localhost'
 attribute :port, :kind_of => Integer, :default => 389
 attribute :credentials, :kind_of => [ String, Hash ], :default => 'default_credentials'
