@@ -63,7 +63,7 @@ action :create do
       add_keys = Array.new
 
       ( all_attribute_names - current_attribute_names ).each do |attr|
-        add_values = attr.is_a?(String) ? [ attr ] : attr
+        add_values = attr.is_a?(String) ? [ all_attributes[attr] ] : all_attributes[attr]
         add_keys.push([ :add, attr, add_values ])
       end
 
