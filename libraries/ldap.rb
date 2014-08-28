@@ -142,12 +142,12 @@ class Chef # :nodoc:
   
       self.bind( c.host, c.port, c.credentials, c.databag_name ) unless @ldap
   
-      relativedn = resource.dn.split(',').first
+      relativedn = resource.distinguished_name.split(',').first
       # Cast as a case insensitive, case preserving hash
       attrs = CICPHash.new.merge!(resource.attributes)
       attrs.merge!(resource.seed_attributes)
       attrs.merge!(Hash[*relativedn.split('=').flatten])
-      @ldap.add dn: resource.dn, attributes: attrs
+      @ldap.add dn: resource.distinguished_name, attributes: attrs
       raise "Unable to add record: #{@ldap.get_operation_result.message}" unless @ldap.get_operation_result.message == 'Success'
     end
   
