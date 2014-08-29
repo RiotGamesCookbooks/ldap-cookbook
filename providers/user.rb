@@ -36,7 +36,7 @@ action :create do
     dn = "#{new_resource.relativedn_attribute}=#{new_resource.common_name},#{new_resource.basedn}"
 
     attrs = CICPHash.new.merge(new_resource.attrs)
-    attrs.merge({ uid: new_resource.common_name })
+    attrs.merge!({ uid: new_resource.common_name })
     attrs[new_resource.relativedn_attribute.to_sym] = new_resource.common_name
 
     objclass = [ 'top', 'account' ]
@@ -53,7 +53,7 @@ action :create do
       require 'digest'
       require 'base64'
       salt = ( rand * 10 ** 5 ).to_s
-      new_resource.password('{SSHA512}' + Base64.encode64(Digest::SHA512.digest( new_resource.password + salt ) + salt ).chomp)
+      new_resource.password('{SSHA}' + Base64.encode64(Digest::SHA1.digest( new_resource.password + salt ) + salt ).chomp)
     end
 
     if new_resource.is_posix
