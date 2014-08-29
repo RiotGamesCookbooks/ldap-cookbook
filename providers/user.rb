@@ -27,16 +27,20 @@ end
 
 action :create do
 
+  require 'cicphash'
+
   @connectinfo = load_connection_info
 
   converge_by("Creating #{new_resource.common_name}") do
 
     dn = "#{new_resource.relativedn_attribute}=#{new_resource.common_name},#{new_resource.basedn}"
 
-    objclass = [ 'top', 'account' ]
-    attrs = new_resource.attrs.merge({ uid: new_resource.common_name })
+    attrs = CICPHash.new.merge(new_resource.attrs)
+    attrs.merge({ uid: new_resource.common_name })
     attrs[new_resource.relativedn_attribute.to_sym] = new_resource.common_name
 
+    objclass = [ 'top', 'account' ]
+    objclass.push(attrs[:objectClass]) if attrs.key?(:objectClass)
     objclass.push( 'extensibleObject' ) if new_resource.is_extensible
 
     if new_resource.is_person
