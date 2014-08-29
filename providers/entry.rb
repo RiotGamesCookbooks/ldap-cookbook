@@ -44,10 +44,9 @@ action :create do
 
     if @current_resource.nil?
       Chef::Log.info("Adding #{@new_resource.distinguished_name}")
-      new_entry_attrs = new_attributes
-      new_entry_attrs.merge!(seed_attributes)
-      new_entry_attrs.merge!(append_attributes)
-      ldap.add_entry(@connectinfo, @new_resource.distinguished_name, new_entry_attrs)
+      new_attributes.merge!(seed_attributes)
+      new_attributes.merge!(append_attributes)
+      ldap.add_entry(@connectinfo, @new_resource.distinguished_name, new_attributes)
       new_resource.updated_by_last_action(true)
     else
 
