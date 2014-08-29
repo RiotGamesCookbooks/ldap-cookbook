@@ -38,14 +38,19 @@ action :create do
     ldap = Chef::Ldap.new
     @connectinfo = load_connection_info
 
+    new_attributes = CICPHash.new.merge(@new_resource.attributes.to_hash)
+    seed_attributes = CICPHash.new.merge(@new_resource.seed_attributes.to_hash)
+    append_attributes = CICPHash.new.merge(@new_resource.append_attributes.to_hash)
+
     if @current_resource.nil?
       Chef::Log.info("Adding #{@new_resource.distinguished_name}")
-      ldap.add_entry(@connectinfo, @new_resource)
+      new_entry_attrs = new_attributes
+      new_entry_attrs.merge!(seed_attributes)
+      new_entry_attrs.merge!(append_attributes)
+      ldap.add_entry(@connectinfo, @new_resource.distinguished_name, new_entry_attrs)
       new_resource.updated_by_last_action(true)
     else
 
-      new_attributes = CICPHash.new.merge(@new_resource.attributes.to_hash)
-      seed_attributes = CICPHash.new.merge(@new_resource.seed_attributes.to_hash)
       seed_attribute_names = seed_attributes.keys.map{ |k| k.downcase.to_s }
       current_attribute_names = @current_resource.attribute_names.map{ |k| k.downcase.to_s }
 
@@ -55,7 +60,6 @@ action :create do
         new_attributes.merge!({ attr => value })
       end
 
-      append_attributes = CICPHash.new.merge(@new_resource.append_attributes.to_hash)
       all_attributes = new_attributes.merge(append_attributes)
       all_attribute_names = all_attributes.keys.map{ |k| k.downcase.to_s }
 

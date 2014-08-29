@@ -138,16 +138,15 @@ class Chef # :nodoc:
     # Chef::Resource::LdapEntry objects that will also have a .dn method and attributes 
     # to be set on the entry to be created.
 
-    def add_entry( c, resource ) # :yields: connection_info, resource
+    def add_entry( c, dn, attrs ) # :yields: connection_info, distinguished_name, attributes
   
       self.bind( c.host, c.port, c.credentials, c.databag_name ) unless @ldap
   
-      relativedn = resource.distinguished_name.split(',').first
-      # Cast as a case insensitive, case preserving hash
-      attrs = CICPHash.new.merge!(resource.attributes)
-      attrs.merge!(resource.seed_attributes)
+      relativedn = dn.split(',').first
+      # Ensure no duplicates by casting as a case insensitive, case preserving hash
+      attrs = CICPHash.new.merge(attrs)
       attrs.merge!(Hash[*relativedn.split('=').flatten])
-      @ldap.add dn: resource.distinguished_name, attributes: attrs
+      @ldap.add dn: dn, attributes: attrs
       raise "Unable to add record: #{@ldap.get_operation_result.message}" unless @ldap.get_operation_result.message == 'Success'
     end
   
