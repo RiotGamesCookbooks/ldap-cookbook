@@ -134,9 +134,8 @@ class Chef # :nodoc:
   
     # == Add Entry
     # 
-    # This method accepts a connection resource object. It is intended to be used with
-    # Chef::Resource::LdapEntry objects that will also have a .dn method and attributes 
-    # to be set on the entry to be created.
+    # This method accepts a connection resource object, a distinguished name, 
+    # and the attributes for the entry to be added.
 
     def add_entry( c, dn, attrs ) # :yields: connection_info, distinguished_name, attributes
   
