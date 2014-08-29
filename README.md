@@ -16,7 +16,7 @@ This resource is used to manage generic LDAP entries. It makes use of the ruby n
 
 Name | Description | Type | Default
 -----|-------------|------|----------
-dn | Distinguished Name (DN) | String | Name Attribute
+distinguished_name | Distinguished Name (DN) | String | Name Attribute
 attributes | Attributes to be set on the entry. Existing attributes of the same name will have their contents replaced | Hash
 append_attributes | Attributes whose values are to be appended to any existing values, if any | Hash
 seed_attributes | Attributes whose values are to be set once and not modified again | Hash
@@ -50,6 +50,7 @@ gid_number | Required for posix accounts. If not supplied, the basedn will be se
 is_person | Will this be used by a person? | Boolean | true
 is_posix | Will this be used on a posix system? | Boolean | true
 is_extensible | Can the entry be extended using custom attributes? | Boolean | false
+attrs | additional attributes to be added to the account | Hash | 
 
 __ACTIONS__
 * __create__
