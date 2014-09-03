@@ -78,7 +78,8 @@ action :create do
         # Ignore Distinguished Name (DN) and the Relative DN. 
         # These should only be modified upon entry creation to avoid schema violations
         relative_distinguished_name = @new_resource.distinguished_name.split('=').first
-        next if attr =~ /DN/i || attr <=> relative_distinguished_name 
+
+        next if attr =~ /DN/i || attr == relative_distinguished_name 
 
         if append_attributes[attr]
 
@@ -93,7 +94,6 @@ action :create do
         if new_attributes[attr]
 
           replace_values = new_attributes[attr].is_a?(String) ? [ new_attributes[attr] ] : new_attributes[attr]
-
           if ( replace_values.size > 0 ) and ( replace_values != @current_resource.send(attr) )
             update_keys.push([ :replace, attr, replace_values ])
           end
