@@ -86,7 +86,7 @@ class Chef # :nodoc:
 
       raise "Must specify base dn for search" unless basedn
 
-      ( filter, scope ) = constraints
+      ( filter, scope, attributes ) = constraints
       filter = filter.nil? ? Net::LDAP::Filter.eq( 'objectClass', '*' ) : filter
 
       case scope
@@ -99,12 +99,13 @@ class Chef # :nodoc:
       end
 
       scope = scope.nil? ? Net::LDAP::SearchScope_BaseObject : scope
+      attributes = attributes.nil? ? [ '*' ] : attributes
 
       entries = @ldap.search( 
                   base:   basedn, 
                   filter: filter,
                   scope:  scope,
-                  attributes: [ '*' ]
+                  attributes: attributes
                 )
 
       raise "Error while searching: #{@ldap.get_operation_result.message}" unless @ldap.get_operation_result.message =~ /(Success|No Such Object)/
