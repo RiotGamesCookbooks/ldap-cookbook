@@ -94,7 +94,7 @@ action :create do
         if new_attributes[attr]
 
           replace_values = new_attributes[attr].is_a?(String) ? [ new_attributes[attr] ] : new_attributes[attr]
-          if ( replace_values.size > 0 ) and ( replace_values != @current_resource.send(attr) )
+          if ( replace_values.size > 0 ) and ( replace_values.sort != @current_resource.send(attr).sort )
             update_keys.push([ :replace, attr, replace_values ])
           end
         end
