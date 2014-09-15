@@ -53,7 +53,7 @@ action :create do
       seed_attribute_names = seed_attributes.keys.map{ |k| k.downcase.to_s }
       current_attribute_names = @current_resource.attribute_names.map{ |k| k.downcase.to_s }
 
-      # Include seed attributes in with the normal attributes as long as they don't already exist
+      # Include seed attributes in with the normal attributes 
       ( seed_attribute_names - current_attribute_names ).each do |attr|
         value = seed_attributes[attr].is_a?(String) ? [ seed_attributes[attr] ] : seed_attributes[attr]
         new_attributes.merge!({ attr => value })
@@ -61,6 +61,34 @@ action :create do
 
       all_attributes = new_attributes.merge(append_attributes)
       all_attribute_names = all_attributes.keys.map{ |k| k.downcase.to_s }
+
+      # Prune unwanted attributes and/or values
+      prune_keys = Array.new
+
+      prune_whole_attributes = @new_resource.prune.is_a?(Array) ? @new_resource.prune.map{ |k| k.to_s } : []
+      prune_attribute_values = @new_resource.prune.is_a?(Hash) ? @new_resource.prune.to_h : {}
+
+      prune_whole_attributes.each do |attr|
+        all_attributes.delete(attr)
+        all_attribute_names.reject{ |name| name == attr }
+        next unless @current_resource.respond_to?(attr)
+        prune_keys.push([ :delete, attr, nil ])
+      end
+
+      prune_attribute_values.each do |attr,values|
+        values = values.kind_of?(String) ? [ values ] : values
+        all_attributes[attr] = all_attributes[attr].kind_of?(String) ? [ all_attributes[attr] ] : all_attributes[attr]
+        all_attributes[attr] -= values
+
+        if all_attributes[attr].size == 0
+          all_attribute_names.reject{ |name| name == attr }
+          all_attributes.delete(attr)
+        end
+
+        next unless @current_resource.respond_to?(attr)
+        values = ( values & @current_resource.send(attr) )
+        prune_keys.push([ :delete, attr, values ]) if values.size > 0
+      end
 
       # Add keys that are missing
       add_keys = Array.new
@@ -97,23 +125,6 @@ action :create do
           if ( replace_values.size > 0 ) and ( replace_values.sort != @current_resource.send(attr).sort )
             update_keys.push([ :replace, attr, replace_values ])
           end
-        end
-      end
-
-      # Prune unwanted attributes and/or values
-      prune_keys = Array.new
-
-      if @new_resource.prune.is_a?(Array)
-        @new_resource.prune.each do |attr|
-          next unless @current_resource.respond_to?(attr)
-          prune_keys.push([ :delete, attr, nil ])
-        end
-      elsif @new_resource.prune.is_a?(Hash)
-        @new_resource.prune.each do |attr, values|
-          next unless @current_resource.respond_to?(attr)
-          values = values.is_a?(String) ? [ values ] : values
-          values = ( values & @current_resource.send(attr) )
-          prune_keys.push([ :delete, attr, values ]) if values.size > 0
         end
       end
 
