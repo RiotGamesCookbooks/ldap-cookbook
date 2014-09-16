@@ -65,8 +65,8 @@ action :create do
       # Prune unwanted attributes and/or values
       prune_keys = Array.new
 
-      prune_whole_attributes = @new_resource.prune.is_a?(Array) ? @new_resource.prune.map{ |k| k.to_s } : []
-      prune_attribute_values = @new_resource.prune.is_a?(Hash) ? @new_resource.prune.to_h : {}
+      prune_whole_attributes = @new_resource.prune.kind_of?(Array) ? @new_resource.prune.map{ |k| k.to_s } : []
+      prune_attribute_values = @new_resource.prune.kind_of?(Hash) ? @new_resource.prune.to_hash : {}
 
       prune_whole_attributes.each do |attr|
         all_attributes.delete(attr)
@@ -78,7 +78,9 @@ action :create do
       prune_attribute_values.each do |attr,values|
         values = values.kind_of?(String) ? [ values ] : values
         all_attributes[attr] = all_attributes[attr].kind_of?(String) ? [ all_attributes[attr] ] : all_attributes[attr]
-        all_attributes[attr] -= values
+        shred = ( all_attributes[attr] & values )
+        all_attributes[attr] -= shred
+        values -= shred
 
         if all_attributes[attr].size == 0
           all_attribute_names.reject{ |name| name == attr }

@@ -28,6 +28,7 @@ attribute :rights, :kind_of => Array, :default => [ 'all' ]
 # rules
 attribute :userdn_rule, :kind_of => Hash
 attribute :groupdn_rule, :kind_of => Hash
+attribute :roledn_rule, :kind_of => Hash
 attribute :targetattr_rule, :kind_of => Hash
 attribute :ip_rule, :kind_of => Hash
 attribute :dns_rule, :kind_of => Hash
