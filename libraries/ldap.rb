@@ -38,7 +38,7 @@ class Chef # :nodoc:
     # The databag_name is the name of the databag that is used for looking up connection credentials.
     # It returns a connected ruby Net::LDAP object
   
-    def bind( host, port, credentials, databag_name ) # :yields: host, port, credentials, databag_name
+    def bind( host, port, credentials, databag_name, use_tls ) # :yields: host, port, credentials, databag_name, use_tls
 
       credentials = credentials.kind_of?(Hash) ? credentials.to_hash : credentials.to_s
 
@@ -61,13 +61,19 @@ class Chef # :nodoc:
         raise "Invalid credentials: #{credentials}"
       end
 
-      @ldap = Net::LDAP.new host: host,
-                            port: port,
-                            auth: { 
-                              method:   :simple,
-                              username: credentials['bind_dn'],
-                              password: credentials['password']
-                            }
+      args = {
+        host: host,
+        port: port,
+        auth: {
+          method:   :simple,
+          username: credentials['bind_dn'],
+          password: credentials['password']
+        }
+      }
+
+      args[:encryption] = :simple_tls if use_tls
+
+      @ldap = Net::LDAP.new args
   
       raise "Unable to bind: #{@ldap.get_operation_result.message}" unless @ldap.get_operation_result.message == 'Success'
       @ldap
@@ -82,7 +88,7 @@ class Chef # :nodoc:
  
     def search( c, basedn, *constraints ) # :yields: connection_info, basedn, filter, scope
 
-      self.bind( c.host, c.port, c.credentials, c.databag_name ) unless @ldap
+      self.bind( c.host, c.port, c.credentials, c.databag_name, c.use_tls ) unless @ldap
 
       raise "Must specify base dn for search" unless basedn
 
@@ -120,7 +126,7 @@ class Chef # :nodoc:
  
     def get_entry( c, dn ) # :yields: connection_info, distinguished_name
  
-      self.bind( c.host, c.port, c.credentials, c.databag_name ) unless @ldap
+      self.bind( c.host, c.port, c.credentials, c.databag_name, c.use_tls ) unless @ldap
   
       entry = @ldap.search( 
                 base:   dn, 
@@ -140,7 +146,7 @@ class Chef # :nodoc:
 
     def add_entry( c, dn, attrs ) # :yields: connection_info, distinguished_name, attributes
   
-      self.bind( c.host, c.port, c.credentials, c.databag_name ) unless @ldap
+      self.bind( c.host, c.port, c.credentials, c.databag_name, c.use_tls ) unless @ldap
   
       # Ensure no duplicates by casting as a case insensitive, case preserving hash
       attrs = CICPHash.new.merge(attrs)
@@ -181,7 +187,7 @@ class Chef # :nodoc:
 
     def delete_entry( c, dn ) # :yields: connection_info, distinguished_name
   
-      self.bind( c.host, c.port, c.credentials, c.databag_name ) unless @ldap
+      self.bind( c.host, c.port, c.credentials, c.databag_name, c.use_tls ) unless @ldap
       @ldap.delete dn: dn
       raise "Unable to remove record: #{@ldap.get_operation_result.message}" unless @ldap.get_operation_result.message =~ /(Success|No Such Object)/
     end
