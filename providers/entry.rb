@@ -179,12 +179,13 @@ end
 def load_connection_info
 
   @connectinfo = Hash.new
-  @connectinfo.class.module_eval { attr_accessor :host, :port, :credentials, :databag_name }
+  @connectinfo.class.module_eval { attr_accessor :host, :port, :credentials, :databag_name, :use_tls }
   @connectinfo.host = new_resource.host
   @connectinfo.port = new_resource.port
   @connectinfo.credentials = new_resource.credentials
   # default databag name is cookbook name
   databag_name = new_resource.databag_name.nil? ? new_resource.cookbook_name : new_resource.databag_name
   @connectinfo.databag_name = databag_name
+  @connectinfo.use_tls = new_resource.use_tls
   @connectinfo
 end
