@@ -51,7 +51,7 @@ action :create do
     else
 
       seed_attribute_names = seed_attributes.keys.map{ |k| k.downcase.to_s }
-      current_attribute_names = @current_resource.attribute_names.map{ |k| k.downcase.to_s }
+      current_attribute_names = @current_resource.attributes.keys.map{ |k| k.downcase.to_s }
 
       # Include seed attributes in with the normal attributes 
       ( seed_attribute_names - current_attribute_names ).each do |attr|
@@ -71,7 +71,7 @@ action :create do
       prune_whole_attributes.each do |attr|
         all_attributes.delete(attr)
         all_attribute_names.reject{ |name| name == attr }
-        next unless @current_resource.respond_to?(attr)
+        next unless @current_resource.attributes.key?(attr)
         prune_keys.push([ :delete, attr, nil ])
       end
 
@@ -87,8 +87,8 @@ action :create do
           all_attributes.delete(attr)
         end
 
-        next unless @current_resource.respond_to?(attr)
-        values = ( values & @current_resource.send(attr) )
+        next unless @current_resource.attributes.key?(attr)
+        values = ( values & @current_resource.attributes[attr] )
         prune_keys.push([ :delete, attr, values ]) if values.size > 0
       end
 
@@ -114,7 +114,7 @@ action :create do
         if append_attributes[attr]
 
           append_values = append_attributes[attr].is_a?(String) ? [ append_attributes[attr] ] : append_attributes[attr]
-          append_values -= @current_resource.send(attr)
+          append_values -= @current_resource.attributes[attr]
 
           if append_values.size > 0 
             update_keys.push([ :add, attr, append_values ])
@@ -124,7 +124,7 @@ action :create do
         if new_attributes[attr]
 
           replace_values = new_attributes[attr].is_a?(String) ? [ new_attributes[attr] ] : new_attributes[attr]
-          if ( replace_values.size > 0 ) and ( replace_values.sort != @current_resource.send(attr).sort )
+          if ( replace_values.size > 0 ) and ( replace_values.sort != @current_resource.attributes[attr].sort )
             update_keys.push([ :replace, attr, replace_values ])
           end
         end
@@ -160,10 +160,10 @@ action :delete do
   @current_resource = load_current_resource
 
   if @current_resource
-    converge_by("Removing #{@current_resource.dn}") do
+    converge_by("Removing #{@current_resource.distinguished_name}") do
       ldap = Chef::Ldap.new
       @connectinfo = load_connection_info
-      ldap.delete_entry(@connectinfo, @current_resource.dn)
+      ldap.delete_entry(@connectinfo, @current_resource.distinguished_name)
     end
   end
 end
@@ -172,7 +172,16 @@ def load_current_resource
 
   ldap = Chef::Ldap.new
   @connectinfo = load_connection_info
-  @current_resource = ldap.get_entry(@connectinfo, @new_resource.distinguished_name)
+  entry = ldap.get_entry(@connectinfo, @new_resource.distinguished_name)
+  
+  if entry
+    @current_resource = Chef::Resource::LdapEntry.new entry.dn
+    
+    entry.attribute_names.each do |key|
+      @current_resource.attributes[key.to_s] = entry[key]
+    end
+  end
+  
   @current_resource
 end
 
