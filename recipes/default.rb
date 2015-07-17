@@ -18,5 +18,10 @@
 # limitations under the License.
 #
 
-chef_gem "net-ldap"
-chef_gem "cicphash"
+chef_gem "net-ldap" do
+  compile_time true
+end
+
+chef_gem "cicphash" do
+  compile_time true
+end
