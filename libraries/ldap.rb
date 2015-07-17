@@ -151,8 +151,8 @@ class Chef # :nodoc:
       # Ensure no duplicates by casting as a case insensitive, case preserving hash
       attrs = CICPHash.new.merge(attrs)
       # Ensure relativedn is included in the attribute list
-      relativedn = dn.split(',').first
-      attrs.merge!(Hash[*relativedn.split('=').flatten])
+      relativedn = dn.split(/,(?!([\w -]+=[\w -]+,?){1,}\")/).first
+      attrs.merge!(Hash[*relativedn.split('=', 2).flatten])
       @ldap.add dn: dn, attributes: attrs
       raise "Unable to add record: #{@ldap.get_operation_result.message}" unless @ldap.get_operation_result.message == 'Success'
     end
