@@ -47,7 +47,7 @@ action :set do
   old_aci = @current_resource[new_resource.label.to_s][:aci]
   new_aci = compose_aci( new_resource.label, aci_rules )
 
-  converge_by("Setting ACI '#{new_resource.label}' on #{new_resource.distinguished_name}") do
+  converge_if_changed("Setting ACI '#{new_resource.label}' on #{new_resource.distinguished_name}") do
     ldap_entry "#{new_resource.label.gsub(/\ /, '_')}-#{new_resource.distinguished_name}" do
       distinguished_name new_resource.distinguished_name
       host   new_resource.host
@@ -90,7 +90,7 @@ action :extend do
     old_aci = @current_resource[new_resource.label.to_s][:aci]
     new_aci = compose_aci( new_resource.label, aci_rules )
 
-    converge_by("Processing ACI '#{new_resource.label}' on #{new_resource.distinguished_name}") do
+    converge_if_changed("Processing ACI '#{new_resource.label}' on #{new_resource.distinguished_name}") do
       ldap_entry "aci-#{new_resource.label.gsub(/\ /, '_')}-#{new_resource.distinguished_name}" do
         distinguished_name new_resource.distinguished_name
         host   new_resource.host
@@ -132,7 +132,7 @@ action :rescind do
   old_aci = @current_resource[new_resource.label.to_s][:aci]
   new_aci = compose_aci( new_resource.label, aci_rules )
 
-  converge_by("Processing ACI '#{new_resource.label}' on #{new_resource.distinguished_name}") do
+  converge_if_changed("Processing ACI '#{new_resource.label}' on #{new_resource.distinguished_name}") do
     ldap_entry "aci-#{new_resource.label.gsub(/\ /, '_')}-#{new_resource.distinguished_name}" do
       distinguished_name new_resource.distinguished_name
       host   new_resource.host
@@ -151,7 +151,7 @@ action :unset do
   aci_rules = @current_resource[new_resource.label.to_s]
 
   if aci_rules
-    converge_by("Removing #{new_resource.label} from #{new_resource.distinguished_name}") do
+    converge_if_changed("Removing #{new_resource.label} from #{new_resource.distinguished_name}") do
 
       old_aci = aci_rules[:aci]
 

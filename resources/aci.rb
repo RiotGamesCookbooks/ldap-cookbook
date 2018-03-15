@@ -21,24 +21,24 @@
 actions :set, :extend, :rescind, :unset
 default_action :set
 
-attribute :label, :kind_of => String, :name_attribute => true
-attribute :distinguished_name, :kind_of => String, :required => true
-attribute :permit, :kind_of => [ TrueClass, FalseClass ], :default => true
-attribute :rights, :kind_of => Array, :default => [ 'all' ]
+property :label, String, name_attribute: true
+property :distinguished_name, String, required: true
+property :permit, [ TrueClass, FalseClass ], default: true
+property :rights, Array, default: [ 'all' ]
 # rules
-attribute :userdn_rule, :kind_of => Hash
-attribute :groupdn_rule, :kind_of => Hash
-attribute :roledn_rule, :kind_of => Hash
-attribute :targetattr_rule, :kind_of => Hash
-attribute :ip_rule, :kind_of => Hash
-attribute :dns_rule, :kind_of => Hash
+property :userdn_rule, Hash
+property :groupdn_rule, Hash
+property :roledn_rule, Hash
+property :targetattr_rule, Hash
+property :ip_rule, Hash
+property :dns_rule, Hash
 # time spec
-attribute :day_of_week, :kind_of => [ Array, String ]
-attribute :time_of_day_start, :kind_of => String
-attribute :time_of_day_end, :kind_of => String
+property :day_of_week, [ Array, String ]
+property :time_of_day_start, String
+property :time_of_day_end, String
 # for ldap_entry
-attribute :host, :kind_of => String, :default => 'localhost'
-attribute :port, :kind_of => Integer, :default => 389
-attribute :credentials, :kind_of => [ String, Hash ], :default => 'default_credentials'
-attribute :databag_name, :kind_of => String
-attribute :use_tls, :kind_of =>	[TrueClass, FalseClass], :default => false
+property :host, String, default: 'localhost'
+property :port, Integer, default: 389
+property :credentials, [ String, Hash ], default: 'default_credentials'
+property :databag_name, String
+property :use_tls, :kind_of =>	[TrueClass, FalseClass], default: false

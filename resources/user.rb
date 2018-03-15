@@ -21,21 +21,21 @@
 actions :create, :delete
 default_action :create
 
-attribute :common_name, :kind_of => String, :name_attribute => true
-attribute :surname, :kind_of => String
-attribute :password, :kind_of => String
-attribute :home, :kind_of => String
-attribute :shell, :kind_of => String
-attribute :basedn, :kind_of => String, :required => true
-attribute :relativedn_attribute, :kind_of => String, :default => 'uid'
-attribute :uid_number, :kind_of => Integer
-attribute :gid_number, :kind_of => Integer
-attribute :is_person, :kind_of => [ TrueClass, FalseClass ], :default => true
-attribute :is_posix, :kind_of => [ TrueClass, FalseClass ], :default => true
-attribute :is_extensible, :kind_of => [ TrueClass, FalseClass ], :default => false
-attribute :attrs, :kind_of => Hash, :default => {}
-attribute :host, :kind_of => String, :default => 'localhost'
-attribute :port, :kind_of => Integer, :default => 389
-attribute :credentials, :kind_of => [ String, Hash ], :default => 'default_credentials'
-attribute :databag_name, :kind_of => String
-attribute :use_tls, :kind_of =>	[TrueClass, FalseClass], :default => false
+property :common_name, String, name_attribute: true
+property :surname, String
+property :password, String, sensitive: true
+property :home, String
+property :shell, String
+property :basedn, String, required: true
+property :relativedn_attribute, String, default: 'uid'
+property :uid_number, Integer
+property :gid_number, Integer
+property :is_person, [ TrueClass, FalseClass ], default: true
+property :is_posix, [ TrueClass, FalseClass ], default: true
+property :is_extensible, [ TrueClass, FalseClass ], default: false
+property :attrs, Hash
+property :host, String, default: 'localhost'
+property :port, Integer, default: 389
+property :credentials, [ String, Hash ], default: 'default_credentials'
+property :databag_name, String
+property :use_tls, [TrueClass, FalseClass], default: false

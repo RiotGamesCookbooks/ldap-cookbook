@@ -31,7 +31,7 @@ action :create do
 
   @connectinfo = load_connection_info
 
-  converge_by("Creating #{new_resource.common_name}") do
+  converge_if_changed("Creating #{new_resource.common_name}") do
 
     dn = "#{new_resource.relativedn_attribute}=#{new_resource.common_name},#{new_resource.basedn}"
 
@@ -104,7 +104,7 @@ action :delete do
   @current_resource = load_current_resource
 
   if @current_resource
-    converge_by("Removing #{@current_resource[:dn]}") do
+    converge_if_changed("Removing #{@current_resource[:dn]}") do
       ldap_entry @current_resource[:dn] do
         host   new_resource.host
         port   new_resource.port
