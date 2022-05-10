@@ -24,7 +24,7 @@ prune | List of attributes to be removed, or a Hash of attributes with specific 
 host | The host to connect to | String | localhost
 port | The port to connect to | Integer | 389
 credentials | See the 'Credentials' section below | String or Hash | 'default'
-databag_name | The databag that will be used to lookup the credentials data bag item | String | The name of the calling cookbook
+databag_name | The databag that will be used to look up the credentials data bag item | String | The name of the calling cookbook
 use_tls | Use SSL/TLS to connect to the directory server | Boolean | false
 
 __ACTIONS__
