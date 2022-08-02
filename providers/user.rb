@@ -63,8 +63,8 @@ action :create do
 
       ldap = Chef::Ldap.new
 
-      if current_resource and current_resource.attribute_names.include?('uidnumber')
-        unless new_resource.uid_number == current_resource.uid_number
+      if current_resource and current_resource.attributes.key?('uidnumber')
+        unless new_resource.uid_number == current_resource.attributes['uid_number']
           attrs[:uidNumber] = new_resource.uid_number.to_s
         end
       else
@@ -74,8 +74,8 @@ action :create do
         attrs[:uidNumber] = uid.to_s
       end
 
-      if current_resource and current_resource.attribute_names.include?('gidnumber')
-        unless new_resource.gid_number == current_resource.gid_number
+      if current_resource and current_resource.attributes.key?('gidnumber')
+        unless new_resource.gid_number == current_resource.attributes['gid_number']
           attrs[:gidNumber] = new_resource.gid_number.to_s
         end
       else
@@ -120,10 +120,18 @@ def load_current_resource
 
   ldap = Chef::Ldap.new
   @connectinfo = load_connection_info
-  @current_resource = ldap.search( @connectinfo, 
-                                   @new_resource.basedn, 
-                                   "(#{new_resource.relativedn_attribute}=#{new_resource.common_name})", 
-                                   'one' ).first
+  user = ldap.search( @connectinfo, 
+                      @new_resource.basedn, 
+                      "(#{new_resource.relativedn_attribute}=#{new_resource.common_name})", 
+                      'one' ).first
+  
+  if user
+    @current_resource = Chef::Resource::LdapEntry.new user.dn
+    
+    user.attribute_names.each do |key|
+      @current_resource.attributes[key.to_s] = user[key]
+    end
+  end
   @current_resource
 end
 
